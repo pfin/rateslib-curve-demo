@@ -51,6 +51,10 @@
     {
       "source": "/api/hello_quantlib",
       "destination": "/api/hello_quantlib.py"
+    },
+    {
+      "source": "/api/hello_rateslib",
+      "destination": "/api/hello_rateslib.py"
     }
   ],
   "headers": [

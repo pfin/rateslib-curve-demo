@@ -1,2 +1,3 @@
-# Test QuantLib first
+# Test both libraries with simple imports
 QuantLib==1.34
+rateslib==2.0.0
