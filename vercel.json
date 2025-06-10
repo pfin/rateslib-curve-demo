@@ -39,6 +39,14 @@
     {
       "source": "/api/test_rateslib",
       "destination": "/api/test_rateslib.py"
+    },
+    {
+      "source": "/api/test_quantlib",
+      "destination": "/api/test_quantlib.py"
+    },
+    {
+      "source": "/api/curves_quantlib",
+      "destination": "/api/curves_quantlib.py"
     }
   ],
   "headers": [

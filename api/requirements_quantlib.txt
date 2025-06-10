@@ -1,0 +1,3 @@
+# Test if QuantLib works on Vercel
+# QuantLib-Python is the Python wrapper for QuantLib C++ library
+QuantLib==1.34
