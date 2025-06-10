@@ -1,0 +1,2 @@
+# Ultra minimal - just numpy and rateslib's curve functionality
+numpy==2.3.0

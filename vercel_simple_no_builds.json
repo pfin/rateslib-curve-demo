@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/api/hello",
+      "destination": "/api/hello.py"
+    },
+    {
+      "source": "/api/curves", 
+      "destination": "/api/curves_rateslib_only.py"
+    }
+  ]
+}
