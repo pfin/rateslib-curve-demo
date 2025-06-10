@@ -47,6 +47,10 @@
     {
       "source": "/api/curves_quantlib",
       "destination": "/api/curves_quantlib.py"
+    },
+    {
+      "source": "/api/hello_quantlib",
+      "destination": "/api/hello_quantlib.py"
     }
   ],
   "headers": [
