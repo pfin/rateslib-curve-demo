@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import 'chartjs-adapter-date-fns'
@@ -26,6 +26,7 @@ export default function Home() {
   const [selectedFomc, setSelectedFomc] = useState(1) // March FOMC
   const [showRiskMetrics, setShowRiskMetrics] = useState(false)
   const [riskData, setRiskData] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
   // Market data state
   const [marketData, setMarketData] = useState({
@@ -33,8 +34,53 @@ export default function Home() {
     rates: [5.32, 5.32, 5.31, 5.25, 5.15, 5.10, 5.05, 5.00, 4.85, 4.70, 4.50, 4.40, 4.35, 4.45, 4.55, 4.65]
   })
 
-  const buildCurves = async () => {
+  const generateDemoData = useCallback(() => {
+    // Generate demo data that shows the concept
+    const dates = []
+    const smoothForwards = []
+    const compositeForwards = []
+    
+    const startDate = new Date('2024-01-15')
+    
+    for (let i = 0; i < 180; i++) {
+      const date = new Date(startDate)
+      date.setDate(date.getDate() + i)
+      dates.push(date.toISOString().split('T')[0])
+      
+      // Smooth curve - gradual decline
+      const smoothRate = 5.33 - (i / 180) * 0.63
+      smoothForwards.push(smoothRate)
+      
+      // Composite curve - step changes at FOMC dates
+      let compositeRate = 5.33
+      const dateStr = date.toISOString().split('T')[0]
+      
+      if (dateStr >= '2024-03-20') compositeRate -= 0.25  // March FOMC
+      if (dateStr >= '2024-06-12') compositeRate -= 0.25  // June FOMC
+      if (dateStr >= '2024-09-18') compositeRate -= 0.25  // September FOMC
+      
+      compositeForwards.push(compositeRate)
+    }
+    
+    return {
+      smooth: {
+        status: 'SUCCESS',
+        iterations: 6,
+        forwards: smoothForwards
+      },
+      composite: {
+        status: 'SUCCESS',
+        iterations: 8,
+        forwards: compositeForwards
+      },
+      dates: dates,
+      fomc_dates: DEFAULT_FOMC_DATES
+    }
+  }, [])
+
+  const buildCurves = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const response = await fetch('/api/curves', {
         method: 'POST',
@@ -45,16 +91,27 @@ export default function Home() {
           fomc_dates: DEFAULT_FOMC_DATES
         })
       })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const data = await response.json()
       setCurveData(data)
     } catch (error) {
       console.error('Error building curves:', error)
+      setError('Using demo data. Python backend not available in this demo.')
+      
+      // Use demo data as fallback
+      const demoData = generateDemoData()
+      setCurveData(demoData)
     }
     setLoading(false)
-  }
+  }, [marketData, generateDemoData])
 
-  const calculateRiskMetrics = async () => {
+  const calculateRiskMetrics = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const response = await fetch('/api/risk', {
         method: 'POST',
@@ -66,18 +123,50 @@ export default function Home() {
           notional: 10000000
         })
       })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const data = await response.json()
       setRiskData(data)
       setShowRiskMetrics(true)
     } catch (error) {
       console.error('Error calculating risk:', error)
+      
+      // Use demo risk data
+      const demoRiskData = {
+        instrument_type: 'swap',
+        start_date: '2024-02-15',
+        end_date: '2024-05-15',
+        notional: 10000000,
+        smooth_curve: {
+          npv: 12500.00,
+          dv01: -2450.50,
+          convexity: -24.51
+        },
+        composite_curve: {
+          npv: 11875.00,
+          dv01: -2315.25,
+          convexity: -23.15
+        },
+        differences: {
+          npv_diff: -625.00,
+          dv01_diff: 135.25,
+          dv01_pct: -5.52
+        }
+      }
+      setRiskData(demoRiskData)
+      setShowRiskMetrics(true)
     }
     setLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
-    buildCurves()
-  }, [])
+    // Generate demo data immediately
+    const demoData = generateDemoData()
+    setCurveData(demoData)
+  }, [generateDemoData])
 
   const chartData = curveData ? {
     labels: curveData.dates,
@@ -154,6 +243,11 @@ export default function Home() {
           Interactive demonstration showing why step function interpolation is essential for 
           accurately pricing instruments around FOMC meeting dates.
         </p>
+        {error && (
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <p className="text-blue-800 dark:text-blue-200">ℹ️ {error}</p>
+          </div>
+        )}
       </div>
 
       {/* Key Insights */}
@@ -189,6 +283,11 @@ export default function Home() {
           {chartData && (
             <Line data={chartData} options={chartOptions} />
           )}
+          {!chartData && !loading && (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500">Loading chart data...</p>
+            </div>
+          )}
         </div>
         
         {/* FOMC date markers */}
@@ -222,7 +321,7 @@ export default function Home() {
                 value={marketData.rates[idx]}
                 onChange={(e) => {
                   const newRates = [...marketData.rates]
-                  newRates[idx] = parseFloat(e.target.value)
+                  newRates[idx] = parseFloat(e.target.value) || 0
                   setMarketData({ ...marketData, rates: newRates })
                 }}
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
@@ -318,6 +417,14 @@ export default function Home() {
           <li>Calibrate to turn instruments (FRAs) around meeting dates</li>
           <li>Use smooth interpolation only for the long end (&gt;18M)</li>
         </ol>
+        
+        <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <strong>Note:</strong> This demo uses simulated data to illustrate the concept. 
+            In production, the Python backend would use rateslib to build actual curves with real market data.
+            The step function behavior around FOMC dates is clearly visible in the orange line.
+          </p>
+        </div>
       </div>
     </main>
   )
