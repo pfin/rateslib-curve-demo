@@ -1,0 +1,62 @@
+# Vercel ignore file
+# Files and directories to exclude from deployment
+
+# Development files
+*.log
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Python development
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Notebooks and scripts
+*.ipynb
+scripts/
+notebooks/
+
+# Don't upload the entire read_only directory
+read_only/
+
+# Other rateslib notebooks
+../*.py
+../*.ipynb
+../scripts/
+../markdown/
+
+# Large files
+*.pkl
+*.h5
+*.hdf5
+*.parquet
