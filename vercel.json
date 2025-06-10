@@ -19,7 +19,19 @@
     },
     {
       "source": "/api/curves",
-      "destination": "/api/curves_rateslib_only.py"
+      "destination": "/api/curves_modern.py"
+    },
+    {
+      "source": "/api/curves/:path*",
+      "destination": "/api/curves_modern.py"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/curves_modern.py"
+    },
+    {
+      "source": "/api/fomc-dates",
+      "destination": "/api/curves_modern.py"
     },
     {
       "source": "/api/hello_rateslib", 

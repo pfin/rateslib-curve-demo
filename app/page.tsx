@@ -53,28 +53,43 @@ export default function Home() {
       : '/api/curves'
     
     try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          curve_date: '2025-06-10',  // Today's date
-          market_data: marketData,
-          fomc_dates: DEFAULT_FOMC_DATES
-        })
+      // First build flat_forward curve
+      const flatResponse = await fetch(`${apiUrl}?curve_date=2025-06-10&interpolation=flat_forward`, {
+        method: 'GET',
       })
       
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      if (!flatResponse.ok) {
+        const errorData = await flatResponse.json()
+        throw new Error(errorData.error || `HTTP error! status: ${flatResponse.status}`)
       }
       
-      const data = await response.json()
-      setCurveData(data)
+      const flatData = await flatResponse.json()
       
-      // Check if using simplified method
-      if (data.method === 'simplified') {
-        setError('Note: Using simplified calculations (rateslib not available on server)')
+      // Then build log_linear curve
+      const smoothResponse = await fetch(`${apiUrl}?curve_date=2025-06-10&interpolation=log_linear`, {
+        method: 'GET',
+      })
+      
+      if (!smoothResponse.ok) {
+        const errorData = await smoothResponse.json()
+        throw new Error(errorData.error || `HTTP error! status: ${smoothResponse.status}`)
       }
+      
+      const smoothData = await smoothResponse.json()
+      
+      // Transform the response to match expected format
+      const transformedData = {
+        dates: flatData.points.map((p: any) => p.date),
+        smooth: {
+          forwards: smoothData.points.map((p: any) => p.forward_rate)
+        },
+        composite: {
+          forwards: flatData.points.map((p: any) => p.forward_rate)
+        },
+        fomc_dates: DEFAULT_FOMC_DATES
+      }
+      
+      setCurveData(transformedData)
     } catch (error: any) {
       console.error('Error building curves:', error)
       setError(`Failed to build curves: ${error.message}`)

@@ -1,2 +1,5 @@
-# Only rateslib to reduce function size
+# Modern Python API with FastAPI
 rateslib==2.0.0
+fastapi==0.115.6
+mangum==0.17.0
+pydantic==2.10.6
