@@ -1,0 +1,50 @@
+{
+  "date": "2025-06-10",
+  "sofr_spot": 4.29,
+  "sofr_swaps": {
+    "1M": {"rate": 4.31205, "maturity": "2025-07-12"},
+    "2M": {"rate": 4.31665, "maturity": "2025-08-12"},
+    "3M": {"rate": 4.32063, "maturity": "2025-09-12"},
+    "4M": {"rate": 4.30665, "maturity": "2025-10-12"},
+    "5M": {"rate": 4.28823, "maturity": "2025-11-12"},
+    "6M": {"rate": 4.26705, "maturity": "2025-12-12"},
+    "7M": {"rate": 4.2344, "maturity": "2026-01-12"},
+    "8M": {"rate": 4.2046, "maturity": "2026-02-12"},
+    "9M": {"rate": 4.17943, "maturity": "2026-03-12"},
+    "10M": {"rate": 4.1476, "maturity": "2026-04-12"},
+    "11M": {"rate": 4.11973, "maturity": "2026-05-12"},
+    "1Y": {"rate": 4.09175, "maturity": "2026-06-12"},
+    "18M": {"rate": 3.89233, "maturity": "2026-12-12"},
+    "2Y": {"rate": 3.78735, "maturity": "2027-06-12"},
+    "3Y": {"rate": 3.707, "maturity": "2028-06-12"},
+    "4Y": {"rate": 3.70285, "maturity": "2029-06-12"},
+    "5Y": {"rate": 3.727, "maturity": "2030-06-12"},
+    "7Y": {"rate": 3.81635, "maturity": "2032-06-12"},
+    "10Y": {"rate": 3.9476, "maturity": "2035-06-12"},
+    "15Y": {"rate": 4.11095, "maturity": "2040-06-12"},
+    "20Y": {"rate": 4.167, "maturity": "2045-06-12"},
+    "30Y": {"rate": 4.087, "maturity": "2055-06-12"}
+  },
+  "sofr_futures_3m": {
+    "SFRM5": {"price": 95.68, "rate": 4.32, "expiry": "2025-06"},
+    "SFRN5": {"price": 95.71, "rate": 4.29, "expiry": "2025-07"},
+    "SFRQ5": {"price": 95.785, "rate": 4.215, "expiry": "2025-08"},
+    "SFRU5": {"price": 95.855, "rate": 4.145, "expiry": "2025-09"},
+    "SFRV5": {"price": 95.95, "rate": 4.05, "expiry": "2025-10"},
+    "SFRX5": {"price": 96.035, "rate": 3.965, "expiry": "2025-11"},
+    "SFRZ5": {"price": 96.09, "rate": 3.91, "expiry": "2025-12"},
+    "SFRH6": {"price": 96.3, "rate": 3.70, "expiry": "2026-03"},
+    "SFRM6": {"price": 96.465, "rate": 3.535, "expiry": "2026-06"},
+    "SFRU6": {"price": 96.57, "rate": 3.43, "expiry": "2026-09"},
+    "SFRZ6": {"price": 96.62, "rate": 3.38, "expiry": "2026-12"}
+  },
+  "fed_funds_futures": {
+    "FFM5": {"price": 95.6725, "rate": 4.3275, "expiry": "2025-06"},
+    "FFN5": {"price": 95.675, "rate": 4.325, "expiry": "2025-07"},
+    "FFQ5": {"price": 95.705, "rate": 4.295, "expiry": "2025-08"},
+    "FFU5": {"price": 95.765, "rate": 4.235, "expiry": "2025-09"},
+    "FFV5": {"price": 95.85, "rate": 4.15, "expiry": "2025-10"},
+    "FFX5": {"price": 95.955, "rate": 4.045, "expiry": "2025-11"},
+    "FFZ5": {"price": 96.06, "rate": 3.94, "expiry": "2025-12"}
+  }
+}

@@ -1,0 +1,5 @@
+# Minimal requirements for Vercel
+# Try to install rateslib, but don't fail if it doesn't work
+--find-links https://pypi.org/simple/
+--prefer-binary
+rateslib==2.1.0; platform_machine == "x86_64" and platform_system == "Linux"

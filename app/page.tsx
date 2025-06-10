@@ -8,22 +8,26 @@ import { Calendar, TrendingUp, AlertCircle, Calculator } from 'lucide-react'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale)
 
-// FOMC dates for 2025-2026
+// Official FOMC dates for 2025-2026
 const DEFAULT_FOMC_DATES = [
-  // 2025 FOMC meetings
-  '2025-01-29',
-  '2025-03-19',
-  '2025-05-07',
-  '2025-06-18',
-  '2025-07-30',
-  '2025-09-17',
-  '2025-10-29',
-  '2025-12-10',
-  // 2026 FOMC meetings (first 4)
-  '2026-01-28',
-  '2026-03-18',
-  '2026-04-29',
-  '2026-06-17',
+  // 2025 FOMC meetings (using second day of two-day meetings)
+  '2025-01-29',  // January 28-29
+  '2025-03-19',  // March 18-19 (with SEP)
+  '2025-05-07',  // May 6-7
+  '2025-06-18',  // June 17-18 (with SEP)
+  '2025-07-30',  // July 29-30
+  '2025-09-17',  // September 16-17 (with SEP)
+  '2025-10-29',  // October 28-29
+  '2025-12-10',  // December 9-10 (with SEP)
+  // 2026 FOMC meetings
+  '2026-01-28',  // January 27-28
+  '2026-03-18',  // March 17-18 (with SEP)
+  '2026-04-29',  // April 28-29
+  '2026-06-17',  // June 16-17 (with SEP)
+  '2026-07-29',  // July 28-29
+  '2026-09-16',  // September 15-16 (with SEP)
+  '2026-10-28',  // October 27-28
+  '2026-12-09',  // December 8-9 (with SEP)
 ]
 
 export default function Home() {
@@ -34,10 +38,10 @@ export default function Home() {
   const [riskData, setRiskData] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Market data state
+  // Market data state - Live SOFR swap rates from Bloomberg (June 10, 2025)
   const [marketData, setMarketData] = useState({
-    tenors: ['1W', '2W', '1M', '2M', '3M', '4M', '5M', '6M', '9M', '1Y', '18M', '2Y', '3Y', '5Y', '7Y', '10Y'],
-    rates: [5.32, 5.32, 5.31, 5.25, 5.15, 5.10, 5.05, 5.00, 4.85, 4.70, 4.50, 4.40, 4.35, 4.45, 4.55, 4.65]
+    tenors: ['1M', '2M', '3M', '4M', '5M', '6M', '7M', '8M', '9M', '10M', '11M', '1Y', '18M', '2Y', '3Y', '4Y', '5Y', '7Y', '10Y', '15Y', '20Y', '30Y'],
+    rates: [4.31215, 4.31619, 4.3204, 4.30612, 4.28827, 4.26725, 4.23438, 4.2047, 4.1795, 4.148, 4.12016, 4.09225, 3.893, 3.78885, 3.70875, 3.7049, 3.72945, 3.8182, 3.94905, 4.112, 4.1675, 4.0875]
   })
 
   const buildCurves = useCallback(async () => {
@@ -48,7 +52,7 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          curve_date: '2025-01-15',
+          curve_date: '2025-06-10',  // Today's date
           market_data: marketData,
           fomc_dates: DEFAULT_FOMC_DATES
         })
@@ -61,6 +65,11 @@ export default function Home() {
       
       const data = await response.json()
       setCurveData(data)
+      
+      // Check if using simplified method
+      if (data.method === 'simplified') {
+        setError('Note: Using simplified calculations (rateslib not available on server)')
+      }
     } catch (error: any) {
       console.error('Error building curves:', error)
       setError(`Failed to build curves: ${error.message}`)
@@ -77,8 +86,8 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           instrument_type: 'swap',
-          start_date: '2025-02-15',
-          end_date: '2025-05-15',
+          start_date: '2025-07-15',
+          end_date: '2025-10-15',
           notional: 10000000
         })
       })
@@ -197,9 +206,9 @@ export default function Home() {
         <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
           <div className="flex items-center mb-2">
             <TrendingUp className="w-5 h-5 mr-2 text-orange-600" />
-            <h3 className="font-semibold">Rate Expectations</h3>
+            <h3 className="font-semibold">Current SOFR</h3>
           </div>
-          <p className="text-sm">Market pricing 75bps of cuts by September</p>
+          <p className="text-sm">4.29% spot, inverting to 3.71% at 3Y</p>
         </div>
         
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
@@ -218,7 +227,7 @@ export default function Home() {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Building curves with rateslib...</p>
+                <p className="mt-4 text-gray-600">Building curves...</p>
               </div>
             </div>
           )}
@@ -229,7 +238,7 @@ export default function Home() {
         
         {/* FOMC date markers */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {DEFAULT_FOMC_DATES.slice(0, 4).map((date, idx) => (
+          {DEFAULT_FOMC_DATES.slice(0, 8).map((date, idx) => (
             <div
               key={date}
               className={`px-3 py-1 rounded text-sm ${
@@ -239,7 +248,7 @@ export default function Home() {
               } cursor-pointer`}
               onClick={() => setSelectedFomc(idx)}
             >
-              FOMC {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </div>
           ))}
         </div>

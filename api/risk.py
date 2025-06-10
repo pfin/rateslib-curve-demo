@@ -22,7 +22,7 @@ class handler(BaseHTTPRequestHandler):
             notional = data.get('notional', 10000000)
             
             # Build curves first (simplified - in production you'd pass curve state)
-            curve_date = dt(2025, 1, 15)
+            curve_date = dt(2025, 6, 10)  # Today's date
             smooth_curve = build_smooth_curve(curve_date)
             composite_curve = build_composite_curve(curve_date)
             
@@ -80,8 +80,8 @@ class handler(BaseHTTPRequestHandler):
 
 def build_smooth_curve(curve_date):
     """Build a simple smooth curve for risk calculations"""
-    tenors = ['1W', '2W', '1M', '2M', '3M', '6M', '9M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y']
-    rates = [5.32, 5.32, 5.31, 5.25, 5.15, 5.00, 4.85, 4.70, 4.40, 4.35, 4.45, 4.55, 4.65]
+    tenors = ['1M', '2M', '3M', '6M', '9M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y']
+    rates = [4.312, 4.316, 4.320, 4.267, 4.180, 4.092, 3.789, 3.709, 3.729, 3.818, 3.949]
     
     instruments = []
     for tenor in tenors:
@@ -119,7 +119,7 @@ def build_composite_curve(curve_date):
     
     # Long end
     long_tenors = ['2Y', '3Y', '5Y', '7Y', '10Y']
-    long_rates = [4.40, 4.35, 4.45, 4.55, 4.65]
+    long_rates = [3.70, 3.75, 3.85, 3.95, 4.05]
     
     long_instruments = []
     for tenor in long_tenors:
@@ -152,12 +152,12 @@ def build_composite_curve(curve_date):
     # Short end with FOMC dates
     short_nodes = {curve_date: 1.0}
     
-    # Add some FOMC dates for 2025
+    # Add upcoming FOMC dates from June 2025
     fomc_dates = [
-        dt(2025, 1, 29),
-        dt(2025, 3, 19),
-        dt(2025, 5, 7),
-        dt(2025, 6, 18)
+        dt(2025, 6, 18),  # Next week
+        dt(2025, 7, 30),
+        dt(2025, 9, 17),
+        dt(2025, 10, 29)
     ]
     
     for fomc in fomc_dates:
@@ -190,7 +190,7 @@ def build_composite_curve(curve_date):
     )
     
     # Calibrate short end
-    short_rates = [5.32, 5.32, 5.31, 5.25, 5.15, 5.00, 4.85, 4.70]
+    short_rates = [4.33, 4.33, 4.32, 4.28, 4.20, 4.05, 3.95, 3.85]
     short_instruments = []
     
     for i, tenor in enumerate(short_tenors):
@@ -219,7 +219,7 @@ def calculate_risk_metrics(instrument_type, start_date, end_date, notional, smoo
             effective=start_date,
             termination=end_date,
             spec="usd_irs",
-            fixed_rate=5.15,
+            fixed_rate=4.15,
             notional=notional,
             curves="SMOOTH"
         )
@@ -228,7 +228,7 @@ def calculate_risk_metrics(instrument_type, start_date, end_date, notional, smoo
             effective=start_date,
             termination=end_date,
             spec="usd_irs",
-            fixed_rate=5.15,
+            fixed_rate=4.15,
             notional=notional,
             curves="COMPOSITE"
         )
@@ -250,7 +250,7 @@ def calculate_risk_metrics(instrument_type, start_date, end_date, notional, smoo
         fra_smooth = rl.FRA(
             effective=start_date,
             termination="3M",
-            fixed_rate=5.20,
+            fixed_rate=4.20,
             notional=notional,
             curves="SMOOTH"
         )
@@ -258,7 +258,7 @@ def calculate_risk_metrics(instrument_type, start_date, end_date, notional, smoo
         fra_composite = rl.FRA(
             effective=start_date,
             termination="3M",
-            fixed_rate=5.20,
+            fixed_rate=4.20,
             notional=notional,
             curves="COMPOSITE"
         )
