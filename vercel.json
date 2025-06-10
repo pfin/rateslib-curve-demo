@@ -9,22 +9,22 @@
       "use": "@vercel/python"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/hello",
-      "dest": "/api/hello.py"
+      "source": "/api/hello",
+      "destination": "/api/hello.py"
     },
     {
-      "src": "/api/curves",
-      "dest": "/api/curves_hybrid.py"
+      "source": "/api/curves",
+      "destination": "/api/curves_hybrid.py"
     },
     {
-      "src": "/api/hello_quantlib",
-      "dest": "/api/hello_quantlib.py"
+      "source": "/api/hello_quantlib",
+      "destination": "/api/hello_quantlib.py"
     },
     {
-      "src": "/api/hello_rateslib", 
-      "dest": "/api/hello_rateslib.py"
+      "source": "/api/hello_rateslib", 
+      "destination": "/api/hello_rateslib.py"
     }
   ],
   "headers": [
