@@ -1,6 +1,2 @@
-# Install rateslib with pre-compiled wheels
-# If this fails on Vercel, we need to use a different approach
-rateslib>=2.0.0
-
-# Alternative: Install from GitHub releases with pre-compiled wheel
-# https://github.com/attack68/rateslib/releases
+# Rateslib - Fixed income library with Rust extensions
+rateslib==2.0.0

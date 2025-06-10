@@ -23,12 +23,11 @@ echo "=== Attempting to install rateslib ==="
 
 # Method 1: Try pre-built wheels
 echo "Method 1: Trying pre-built wheels..."
-pip install --only-binary :all: rateslib==2.1.0 || echo "Method 1 failed"
+pip install --only-binary :all: rateslib==2.0.0 || echo "Method 1 failed"
 
-# Method 2: Try from specific wheel URL
-echo "Method 2: Trying specific wheel..."
-WHEEL_URL="https://files.pythonhosted.org/packages/cp312/r/rateslib/rateslib-2.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-pip install $WHEEL_URL || echo "Method 2 failed"
+# Method 2: Try from PyPI with platform tag
+echo "Method 2: Trying with platform tag..."
+pip install rateslib==2.0.0 --platform manylinux2014_x86_64 --only-binary :all: || echo "Method 2 failed"
 
 # Method 3: Install without dependencies first
 echo "Method 3: Trying without deps..."

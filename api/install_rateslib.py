@@ -17,10 +17,10 @@ def install_rateslib():
         ["pip", "install", "--only-binary", ":all:", "rateslib"],
         
         # Method 2: Try specific wheel version
-        ["pip", "install", "rateslib==2.1.0", "--only-binary", ":all:"],
+        ["pip", "install", "rateslib==2.0.0", "--only-binary", ":all:"],
         
-        # Method 3: Try from GitHub releases
-        ["pip", "install", "https://github.com/attack68/rateslib/releases/download/v2.1.0/rateslib-2.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"],
+        # Method 3: Try from GitHub releases (check if available)
+        ["pip", "install", "https://github.com/attack68/rateslib/releases/download/v2.0.0/rateslib-2.0.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"],
         
         # Method 4: Install build tools and compile
         ["pip", "install", "maturin", "setuptools-rust", "rateslib"],

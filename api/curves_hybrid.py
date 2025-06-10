@@ -65,12 +65,11 @@ def build_curves_rateslib(curve_date, market_data, fomc_dates):
     """Build curves using rateslib"""
     # Default market data if not provided
     if not market_data or 'tenors' not in market_data:
-        # Load from our JSON file
-        with open('api/market_data.json', 'r') as f:
-            md = json.load(f)
-            tenors = list(md['sofr_swaps'].keys())
-            rates = [md['sofr_swaps'][t]['rate'] for t in tenors]
-            market_data = {'tenors': tenors, 'rates': rates}
+        # Use default market data
+        market_data = {
+            'tenors': ['1M', '2M', '3M', '6M', '9M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y'],
+            'rates': [4.312, 4.316, 4.320, 4.267, 4.180, 4.092, 3.789, 3.709, 3.729, 3.818, 3.949]
+        }
     
     tenors = market_data['tenors']
     rates = market_data['rates']
@@ -286,12 +285,11 @@ def build_curves_simple(curve_date, market_data, fomc_dates):
     
     # Default market data if not provided
     if not market_data or 'tenors' not in market_data:
-        # Load from our JSON file
-        with open('market_data.json', 'r') as f:
-            md = json.load(f)
-            tenors = list(md['sofr_swaps'].keys())
-            rates = [md['sofr_swaps'][t]['rate'] for t in tenors]
-            market_data = {'tenors': tenors, 'rates': rates}
+        # Use default market data
+        market_data = {
+            'tenors': ['1M', '2M', '3M', '6M', '9M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y'],
+            'rates': [4.312, 4.316, 4.320, 4.267, 4.180, 4.092, 3.789, 3.709, 3.729, 3.818, 3.949]
+        }
     
     tenors = market_data['tenors']
     rates = market_data['rates']
