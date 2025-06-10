@@ -1,3 +1,2 @@
-# Use latest versions
-QuantLib==1.38
+# Only rateslib to reduce function size
 rateslib==2.0.0

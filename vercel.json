@@ -19,11 +19,7 @@
     },
     {
       "source": "/api/curves",
-      "destination": "/api/curves_hybrid.py"
-    },
-    {
-      "source": "/api/hello_quantlib",
-      "destination": "/api/hello_quantlib.py"
+      "destination": "/api/curves_rateslib_only.py"
     },
     {
       "source": "/api/hello_rateslib", 
