@@ -1,3 +1,3 @@
-# Test both libraries with simple imports
-QuantLib==1.34
+# Use latest versions
+QuantLib==1.38
 rateslib==2.0.0

@@ -1,0 +1,3 @@
+# Minimal requirements for Vercel deployment
+# Only include rateslib for now to reduce size
+rateslib==2.0.0
