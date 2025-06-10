@@ -8,16 +8,22 @@ import { Calendar, TrendingUp, AlertCircle, Calculator } from 'lucide-react'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale)
 
-// Default FOMC dates for 2024
+// FOMC dates for 2025-2026
 const DEFAULT_FOMC_DATES = [
-  '2024-01-31',
-  '2024-03-20',
-  '2024-05-01',
-  '2024-06-12',
-  '2024-07-31',
-  '2024-09-18',
-  '2024-11-07',
-  '2024-12-18',
+  // 2025 FOMC meetings
+  '2025-01-29',
+  '2025-03-19',
+  '2025-05-07',
+  '2025-06-18',
+  '2025-07-30',
+  '2025-09-17',
+  '2025-10-29',
+  '2025-12-10',
+  // 2026 FOMC meetings (first 4)
+  '2026-01-28',
+  '2026-03-18',
+  '2026-04-29',
+  '2026-06-17',
 ]
 
 export default function Home() {
@@ -34,50 +40,6 @@ export default function Home() {
     rates: [5.32, 5.32, 5.31, 5.25, 5.15, 5.10, 5.05, 5.00, 4.85, 4.70, 4.50, 4.40, 4.35, 4.45, 4.55, 4.65]
   })
 
-  const generateDemoData = useCallback(() => {
-    // Generate demo data that shows the concept
-    const dates = []
-    const smoothForwards = []
-    const compositeForwards = []
-    
-    const startDate = new Date('2024-01-15')
-    
-    for (let i = 0; i < 180; i++) {
-      const date = new Date(startDate)
-      date.setDate(date.getDate() + i)
-      dates.push(date.toISOString().split('T')[0])
-      
-      // Smooth curve - gradual decline
-      const smoothRate = 5.33 - (i / 180) * 0.63
-      smoothForwards.push(smoothRate)
-      
-      // Composite curve - step changes at FOMC dates
-      let compositeRate = 5.33
-      const dateStr = date.toISOString().split('T')[0]
-      
-      if (dateStr >= '2024-03-20') compositeRate -= 0.25  // March FOMC
-      if (dateStr >= '2024-06-12') compositeRate -= 0.25  // June FOMC
-      if (dateStr >= '2024-09-18') compositeRate -= 0.25  // September FOMC
-      
-      compositeForwards.push(compositeRate)
-    }
-    
-    return {
-      smooth: {
-        status: 'SUCCESS',
-        iterations: 6,
-        forwards: smoothForwards
-      },
-      composite: {
-        status: 'SUCCESS',
-        iterations: 8,
-        forwards: compositeForwards
-      },
-      dates: dates,
-      fomc_dates: DEFAULT_FOMC_DATES
-    }
-  }, [])
-
   const buildCurves = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -86,28 +48,25 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          curve_date: '2024-01-15',
+          curve_date: '2025-01-15',
           market_data: marketData,
           fomc_dates: DEFAULT_FOMC_DATES
         })
       })
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
       
       const data = await response.json()
       setCurveData(data)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error building curves:', error)
-      setError('Using demo data. Python backend not available in this demo.')
-      
-      // Use demo data as fallback
-      const demoData = generateDemoData()
-      setCurveData(demoData)
+      setError(`Failed to build curves: ${error.message}`)
     }
     setLoading(false)
-  }, [marketData, generateDemoData])
+  }, [marketData])
 
   const calculateRiskMetrics = useCallback(async () => {
     setLoading(true)
@@ -118,55 +77,30 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           instrument_type: 'swap',
-          start_date: '2024-02-15',
-          end_date: '2024-05-15',
+          start_date: '2025-02-15',
+          end_date: '2025-05-15',
           notional: 10000000
         })
       })
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
       
       const data = await response.json()
       setRiskData(data)
       setShowRiskMetrics(true)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error calculating risk:', error)
-      
-      // Use demo risk data
-      const demoRiskData = {
-        instrument_type: 'swap',
-        start_date: '2024-02-15',
-        end_date: '2024-05-15',
-        notional: 10000000,
-        smooth_curve: {
-          npv: 12500.00,
-          dv01: -2450.50,
-          convexity: -24.51
-        },
-        composite_curve: {
-          npv: 11875.00,
-          dv01: -2315.25,
-          convexity: -23.15
-        },
-        differences: {
-          npv_diff: -625.00,
-          dv01_diff: 135.25,
-          dv01_pct: -5.52
-        }
-      }
-      setRiskData(demoRiskData)
-      setShowRiskMetrics(true)
+      setError(`Failed to calculate risk metrics: ${error.message}`)
     }
     setLoading(false)
   }, [])
 
   useEffect(() => {
-    // Generate demo data immediately
-    const demoData = generateDemoData()
-    setCurveData(demoData)
-  }, [generateDemoData])
+    buildCurves()
+  }, [buildCurves])
 
   const chartData = curveData ? {
     labels: curveData.dates,
@@ -201,7 +135,7 @@ export default function Home() {
       },
       title: {
         display: true,
-        text: '1-Day Forward Rates: Smooth vs Step Function',
+        text: '1-Day Forward Rates: Smooth vs Step Function (Calculated by Rateslib)',
         font: { size: 16 }
       },
       tooltip: {
@@ -237,15 +171,15 @@ export default function Home() {
     <main className="min-h-screen p-8 max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">
-          Step Function vs Smooth Curves for Central Bank Policy Rates
+          Rateslib Demo: Step Function vs Smooth Curves
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">
-          Interactive demonstration showing why step function interpolation is essential for 
+          Using rateslib to demonstrate why step function interpolation is essential for 
           accurately pricing instruments around FOMC meeting dates.
         </p>
         {error && (
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-blue-800 dark:text-blue-200">ℹ️ {error}</p>
+          <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <p className="text-red-800 dark:text-red-200">❌ {error}</p>
           </div>
         )}
       </div>
@@ -280,13 +214,16 @@ export default function Home() {
       {/* Main Chart */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
         <div className="h-96">
-          {chartData && (
-            <Line data={chartData} options={chartOptions} />
-          )}
-          {!chartData && !loading && (
+          {loading && (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">Loading chart data...</p>
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-4 text-gray-600">Building curves with rateslib...</p>
+              </div>
             </div>
+          )}
+          {chartData && !loading && (
+            <Line data={chartData} options={chartOptions} />
           )}
         </div>
         
@@ -310,7 +247,7 @@ export default function Home() {
 
       {/* Market Data Input */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Market Data</h2>
+        <h2 className="text-2xl font-semibold mb-4">Market Data Input</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {marketData.tenors.slice(0, 8).map((tenor, idx) => (
             <div key={tenor}>
@@ -334,7 +271,7 @@ export default function Home() {
           disabled={loading}
           className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? 'Building...' : 'Rebuild Curves'}
+          {loading ? 'Building with Rateslib...' : 'Rebuild Curves'}
         </button>
       </div>
 
@@ -348,7 +285,7 @@ export default function Home() {
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center"
           >
             <Calculator className="w-4 h-4 mr-2" />
-            Calculate Risk
+            Calculate Risk with Rateslib
           </button>
         </div>
         
@@ -387,7 +324,7 @@ export default function Home() {
               <ul className="list-disc list-inside space-y-1 text-sm">
                 <li>NPV Difference: ${riskData.differences.npv_diff.toLocaleString()}</li>
                 <li>DV01 Difference: ${riskData.differences.dv01_diff.toLocaleString()} ({riskData.differences.dv01_pct.toFixed(1)}%)</li>
-                <li>Risk metrics can differ significantly for instruments spanning FOMC dates</li>
+                <li>Risk metrics calculated using rateslib's automatic differentiation</li>
               </ul>
             </div>
           </div>
@@ -396,18 +333,20 @@ export default function Home() {
 
       {/* Educational Content */}
       <div className="mt-12 prose dark:prose-invert max-w-none">
-        <h2>Why Step Functions Matter</h2>
+        <h2>Why Step Functions Matter (Demonstrated with Rateslib)</h2>
         <p>
+          This demo uses <strong>rateslib</strong> to build actual yield curves and calculate forward rates.
           Central banks change policy rates at discrete meetings, not continuously. 
           Using smooth interpolation methods like log-linear or cubic splines for the 
           short end of the curve systematically misprices instruments around these meetings.
         </p>
         
-        <h3>Key Concepts:</h3>
+        <h3>Rateslib Features Used:</h3>
         <ul>
-          <li><strong>Smooth Interpolation:</strong> Averages rate changes over time, missing the discrete jumps</li>
-          <li><strong>Step Function (flat-forward):</strong> Correctly models overnight rate jumps at FOMC dates</li>
-          <li><strong>CompositeCurve:</strong> Combines step function for short end with smooth interpolation for long end</li>
+          <li><strong>Curve Construction:</strong> Building curves with different interpolation methods</li>
+          <li><strong>CompositeCurve:</strong> Combining step function (flat_forward) for short end with smooth interpolation for long end</li>
+          <li><strong>Automatic Differentiation:</strong> Calculating exact risk sensitivities using Dual numbers</li>
+          <li><strong>Solver:</strong> Calibrating curves to market data</li>
         </ul>
         
         <h3>Best Practices:</h3>
@@ -418,11 +357,11 @@ export default function Home() {
           <li>Use smooth interpolation only for the long end (&gt;18M)</li>
         </ol>
         
-        <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <strong>Note:</strong> This demo uses simulated data to illustrate the concept. 
-            In production, the Python backend would use rateslib to build actual curves with real market data.
-            The step function behavior around FOMC dates is clearly visible in the orange line.
+        <div className="mt-8 p-4 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+          <p className="text-sm">
+            <strong>Powered by Rateslib:</strong> All curves and calculations in this demo are performed 
+            using rateslib's professional-grade fixed income analytics. The forward rates you see are 
+            calculated in real-time using actual curve construction and interpolation methods.
           </p>
         </div>
       </div>

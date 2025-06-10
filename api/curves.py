@@ -5,7 +5,6 @@ from http.server import BaseHTTPRequestHandler
 import json
 from datetime import datetime as dt, timedelta
 import rateslib as rl
-import numpy as np
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -17,9 +16,11 @@ class handler(BaseHTTPRequestHandler):
             data = json.loads(post_data)
             
             # Extract parameters
-            curve_date = dt.fromisoformat(data.get('curve_date', '2024-01-15'))
+            curve_date_str = data.get('curve_date', '2025-01-15')
+            curve_date = dt.fromisoformat(curve_date_str)
             market_data = data.get('market_data', {})
-            fomc_dates = [dt.fromisoformat(d) for d in data.get('fomc_dates', [])]
+            fomc_dates_str = data.get('fomc_dates', [])
+            fomc_dates = [dt.fromisoformat(d) for d in fomc_dates_str]
             
             # Build curves
             result = build_curves(curve_date, market_data, fomc_dates)
@@ -29,13 +30,31 @@ class handler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps(result).encode())
+            
+            # Convert result to JSON-serializable format
+            response_data = {
+                'smooth': {
+                    'status': result['smooth']['status'],
+                    'iterations': result['smooth']['iterations'],
+                    'forwards': [float(f) if f is not None else None for f in result['smooth']['forwards']]
+                },
+                'composite': {
+                    'status': result['composite']['status'],
+                    'iterations': result['composite']['iterations'],
+                    'forwards': [float(f) if f is not None else None for f in result['composite']['forwards']]
+                },
+                'dates': result['dates'],
+                'fomc_dates': result['fomc_dates']
+            }
+            
+            self.wfile.write(json.dumps(response_data).encode())
             
         except Exception as e:
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps({'error': str(e)}).encode())
+            self.wfile.write(json.dumps({'error': str(e), 'type': type(e).__name__}).encode())
     
     def do_OPTIONS(self):
         """Handle CORS preflight"""
@@ -46,10 +65,10 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
 def build_curves(curve_date, market_data, fomc_dates):
-    """Build both smooth and step function curves"""
+    """Build both smooth and step function curves using rateslib"""
     
     # Default market data if not provided
-    if not market_data:
+    if not market_data or 'tenors' not in market_data:
         market_data = {
             'tenors': ['1W', '2W', '1M', '2M', '3M', '4M', '5M', '6M', '9M', '1Y', '18M', '2Y', '3Y', '5Y', '7Y', '10Y'],
             'rates': [5.32, 5.32, 5.31, 5.25, 5.15, 5.10, 5.05, 5.00, 4.85, 4.70, 4.50, 4.40, 4.35, 4.45, 4.55, 4.65]
@@ -78,17 +97,25 @@ def build_curves(curve_date, market_data, fomc_dates):
             smooth_fwd = smooth_curve_data['curve'].rate(
                 effective=date, 
                 termination=date + timedelta(days=1)
-            ).real * 100
+            )
+            # Handle Dual objects
+            if hasattr(smooth_fwd, 'real'):
+                smooth_fwd = smooth_fwd.real
+            smooth_forwards.append(float(smooth_fwd) * 100)
+        except:
+            smooth_forwards.append(None)
+        
+        try:
             composite_fwd = composite_curve_data['curve'].rate(
                 effective=date, 
                 termination=date + timedelta(days=1)
-            ).real * 100
+            )
+            # Handle Dual objects
+            if hasattr(composite_fwd, 'real'):
+                composite_fwd = composite_fwd.real
+            composite_forwards.append(float(composite_fwd) * 100)
         except:
-            smooth_fwd = None
-            composite_fwd = None
-            
-        smooth_forwards.append(smooth_fwd)
-        composite_forwards.append(composite_fwd)
+            composite_forwards.append(None)
     
     return {
         'smooth': {
@@ -106,7 +133,7 @@ def build_curves(curve_date, market_data, fomc_dates):
     }
 
 def build_smooth_curve(curve_date, tenors, rates):
-    """Build standard smooth curve with log-linear interpolation"""
+    """Build standard smooth curve with log-linear interpolation using rateslib"""
     
     # Create instruments
     instruments = []
@@ -148,7 +175,7 @@ def build_smooth_curve(curve_date, tenors, rates):
     }
 
 def build_composite_curve(curve_date, tenors, rates, fomc_dates):
-    """Build composite curve with step function for short end"""
+    """Build composite curve with step function for short end using rateslib"""
     
     # Split tenors into short and long
     short_tenors = []
@@ -198,7 +225,7 @@ def build_composite_curve(curve_date, tenors, rates, fomc_dates):
     
     # Add FOMC dates as nodes
     for fomc_date in fomc_dates:
-        if fomc_date > curve_date and fomc_date < curve_date + timedelta(days=365):
+        if fomc_date > curve_date and fomc_date < curve_date + timedelta(days=540):  # 18 months
             short_nodes[fomc_date] = 1.0
     
     # Add standard tenor points

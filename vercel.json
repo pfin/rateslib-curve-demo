@@ -7,7 +7,8 @@
   "regions": ["iad1"],
   "functions": {
     "api/*.py": {
-      "maxDuration": 10
+      "runtime": "python3.12",
+      "maxDuration": 30
     }
   },
   "rewrites": [
@@ -22,6 +23,10 @@
     {
       "source": "/api/risk",
       "destination": "/api/risk.py"
+    },
+    {
+      "source": "/api/test_rateslib",
+      "destination": "/api/test_rateslib.py"
     }
   ],
   "headers": [
