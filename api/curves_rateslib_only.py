@@ -61,17 +61,22 @@ class handler(BaseHTTPRequestHandler):
             step_forwards = []
             smooth_forwards = []
             
+            from datetime import timedelta
+            
             for days in range(0, 365, 7):
-                date = curve_date + rl.dt(days=days)
+                date = curve_date + timedelta(days=days)
                 dates.append(date.isoformat())
                 
                 # Calculate 1-week forward rates
                 try:
-                    step_fwd = step_curve.rate(date, date + rl.dt(days=7))
-                    smooth_fwd = smooth_curve.rate(date, date + rl.dt(days=7))
+                    future_date = date + timedelta(days=7)
+                    step_fwd = step_curve.rate(date, future_date)
+                    smooth_fwd = smooth_curve.rate(date, future_date)
                     step_forwards.append(float(step_fwd) * 100)
                     smooth_forwards.append(float(smooth_fwd) * 100)
-                except:
+                except Exception as e:
+                    # Log the error for debugging
+                    print(f"Error calculating rate for {date}: {e}")
                     step_forwards.append(None)
                     smooth_forwards.append(None)
             
