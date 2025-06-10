@@ -6,20 +6,8 @@
   "installCommand": "npm install",
   "regions": ["iad1"],
   "functions": {
-    "api/curves.py": {
-      "runtime": "python3.12",
-      "maxDuration": 10,
-      "memory": 1024
-    },
-    "api/forwards.py": {
-      "runtime": "python3.12",
-      "maxDuration": 10,
-      "memory": 512
-    },
-    "api/risk.py": {
-      "runtime": "python3.12",
-      "maxDuration": 10,
-      "memory": 512
+    "api/*.py": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
