@@ -47,8 +47,13 @@ export default function Home() {
   const buildCurves = useCallback(async () => {
     setLoading(true)
     setError(null)
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL 
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/curves`
+      : '/api/curves'
+    
     try {
-      const response = await fetch('/api/curves', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,8 +85,13 @@ export default function Home() {
   const calculateRiskMetrics = useCallback(async () => {
     setLoading(true)
     setError(null)
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL 
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/risk`
+      : '/api/risk'
+    
     try {
-      const response = await fetch('/api/risk', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
