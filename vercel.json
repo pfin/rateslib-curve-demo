@@ -46,10 +46,6 @@
       ]
     }
   ],
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@api-url",
-    "PYTHON_VERSION": "3.12"
-  },
   "build": {
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1"
