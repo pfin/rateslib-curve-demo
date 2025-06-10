@@ -26,10 +26,14 @@ class handler(BaseHTTPRequestHandler):
             
             # Extract parameters
             curve_date_str = data.get('curve_date', '2025-06-10')
+            if not isinstance(curve_date_str, str):
+                curve_date_str = '2025-06-10'
             curve_date = dt.fromisoformat(curve_date_str)
             market_data = data.get('market_data', {})
             fomc_dates_str = data.get('fomc_dates', [])
-            fomc_dates = [dt.fromisoformat(d) for d in fomc_dates_str]
+            if not isinstance(fomc_dates_str, list):
+                fomc_dates_str = []
+            fomc_dates = [dt.fromisoformat(d) for d in fomc_dates_str if isinstance(d, str)]
             
             # Build curves
             if RATESLIB_AVAILABLE:
