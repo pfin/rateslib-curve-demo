@@ -10,6 +10,13 @@
       "config": {
         "maxLambdaSize": "50mb"
       }
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     }
   ],
   "rewrites": [
@@ -36,6 +43,18 @@
     {
       "source": "/api/hello_rateslib", 
       "destination": "/api/hello_rateslib.py"
+    },
+    {
+      "source": "/api/examples",
+      "destination": "/api/examples.py"
+    },
+    {
+      "source": "/api/risk",
+      "destination": "/api/risk.py"
+    },
+    {
+      "source": "/api/curves/build",
+      "destination": "/api/curves/build.py"
     }
   ],
   "headers": [

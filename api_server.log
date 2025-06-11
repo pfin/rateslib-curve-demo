@@ -1,0 +1,68 @@
+Traceback (most recent call last):
+  File "/home/peter/SwapPulse/read_only/rateslib/nova_notebooks/nextjs_demo/test_api_local.py", line 9, in <module>
+    from curves_modern import app
+  File "/home/peter/SwapPulse/read_only/rateslib/nova_notebooks/nextjs_demo/api/curves_modern.py", line 60, in <module>
+    class CurveResponse(BaseModel):
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_model_construction.py", line 224, in __new__
+    complete_model_class(
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_model_construction.py", line 602, in complete_model_class
+    schema = cls.__get_pydantic_core_schema__(cls, handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/main.py", line 702, in __get_pydantic_core_schema__
+    return handler(source)
+           ^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_schema_generation_shared.py", line 84, in __call__
+    schema = self._handler(source_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 610, in generate_schema
+    schema = self._generate_schema_inner(obj)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 879, in _generate_schema_inner
+    return self._model_schema(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 691, in _model_schema
+    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 1071, in _generate_md_field_schema
+    common_field = self._common_field_schema(name, field_info, decorators)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 1263, in _common_field_schema
+    schema = self._apply_annotations(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 2056, in _apply_annotations
+    schema = get_inner_schema(source_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_schema_generation_shared.py", line 84, in __call__
+    schema = self._handler(source_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 2037, in inner_handler
+    schema = self._generate_schema_inner(obj)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 884, in _generate_schema_inner
+    return self.match_type(obj)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 986, in match_type
+    return self._match_generic_type(obj, origin)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 1024, in _match_generic_type
+    return self._dict_schema(*self._get_first_two_args_or_any(obj))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 370, in _dict_schema
+    return core_schema.dict_schema(self.generate_schema(keys_type), self.generate_schema(values_type))
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 610, in generate_schema
+    schema = self._generate_schema_inner(obj)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 884, in _generate_schema_inner
+    return self.match_type(obj)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 995, in match_type
+    return self._unknown_type_schema(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/peter/anaconda3/envs/rateslib_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py", line 513, in _unknown_type_schema
+    raise PydanticSchemaGenerationError(
+pydantic.errors.PydanticSchemaGenerationError: Unable to generate pydantic-core schema for <built-in function any>. Set `arbitrary_types_allowed=True` in the model_config to ignore this error or implement `__get_pydantic_core_schema__` on your type to fully support it.
+
+If you got this error by calling handler(<some type>) within `__get_pydantic_core_schema__` then you likely need to call `handler.generate_schema(<some type>)` since we do not call `__get_pydantic_core_schema__` on `<some type>` otherwise to avoid infinite recursion.
+
+For further information visit https://errors.pydantic.dev/2.10/u/schema-for-unknown-type

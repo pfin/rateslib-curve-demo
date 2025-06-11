@@ -5,10 +5,15 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
-from typing import List, Dict, Optional, Literal
+from typing import List, Dict, Optional, Literal, Any
 from datetime import datetime, date, timedelta
-from mangum import Mangum
 import rateslib as rl
+
+try:
+    from mangum import Mangum
+except ImportError:
+    # Mangum is only needed for Vercel deployment
+    Mangum = None
 
 # Create FastAPI app
 app = FastAPI(

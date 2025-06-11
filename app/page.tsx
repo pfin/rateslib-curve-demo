@@ -49,12 +49,12 @@ export default function Home() {
     setError(null)
     
     const apiUrl = process.env.NEXT_PUBLIC_API_URL 
-      ? `${process.env.NEXT_PUBLIC_API_URL}/api/curves`
-      : '/api/curves'
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/curves_modern`
+      : '/api/curves_modern'
     
     try {
       // First build flat_forward curve
-      const flatResponse = await fetch(`${apiUrl}?curve_date=2025-06-10&interpolation=flat_forward`, {
+      const flatResponse = await fetch(`/api/curves?curve_date=2025-06-10&interpolation=flat_forward`, {
         method: 'GET',
       })
       
@@ -66,7 +66,7 @@ export default function Home() {
       const flatData = await flatResponse.json()
       
       // Then build log_linear curve
-      const smoothResponse = await fetch(`${apiUrl}?curve_date=2025-06-10&interpolation=log_linear`, {
+      const smoothResponse = await fetch(`/api/curves?curve_date=2025-06-10&interpolation=log_linear`, {
         method: 'GET',
       })
       
@@ -95,7 +95,7 @@ export default function Home() {
       setError(`Failed to build curves: ${error.message}`)
     }
     setLoading(false)
-  }, [marketData])
+  }, [])
 
   const calculateRiskMetrics = useCallback(async () => {
     setLoading(true)
@@ -358,7 +358,7 @@ export default function Home() {
               <ul className="list-disc list-inside space-y-1 text-sm">
                 <li>NPV Difference: ${riskData.differences.npv_diff.toLocaleString()}</li>
                 <li>DV01 Difference: ${riskData.differences.dv01_diff.toLocaleString()} ({riskData.differences.dv01_pct.toFixed(1)}%)</li>
-                <li>Risk metrics calculated using rateslib's automatic differentiation</li>
+                <li>Risk metrics calculated using rateslib&apos;s automatic differentiation</li>
               </ul>
             </div>
           </div>
@@ -394,7 +394,7 @@ export default function Home() {
         <div className="mt-8 p-4 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
           <p className="text-sm">
             <strong>Powered by Rateslib:</strong> All curves and calculations in this demo are performed 
-            using rateslib's professional-grade fixed income analytics. The forward rates you see are 
+            using rateslib&apos;s professional-grade fixed income analytics. The forward rates you see are 
             calculated in real-time using actual curve construction and interpolation methods.
           </p>
         </div>
